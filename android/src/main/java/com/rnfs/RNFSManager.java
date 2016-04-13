@@ -134,7 +134,7 @@ public class RNFSManager extends ReactContextBaseJavaModule {
 
         fileMap.putString("name", childFile.getName());
         fileMap.putString("path", childFile.getAbsolutePath());
-        fileMap.putInt("size", (int)childFile.length());
+        // fileMap.putInt("size", (int)childFile.length());
         fileMap.putInt("type", childFile.isDirectory() ? 1 : 0);
 
         fileMaps.pushMap(fileMap);
