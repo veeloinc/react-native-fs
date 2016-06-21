@@ -18,6 +18,7 @@ var _readDir = Promise.promisify(RNFSManager.readDir);
 var _exists = Promise.promisify(RNFSManager.exists);
 var _stat = Promise.promisify(RNFSManager.stat);
 var _readFile = Promise.promisify(RNFSManager.readFile);
+var _openFile = Promise.promisify(RNFSManager.openFile);
 var _writeFile = Promise.promisify(RNFSManager.writeFile);
 var _moveFile = Promise.promisify(RNFSManager.moveFile);
 var _unlink = Promise.promisify(RNFSManager.unlink);
@@ -87,6 +88,14 @@ var RNFS = {
   exists(filepath) {
     return _exists(filepath)
       .catch(convertError);
+  },
+
+  openFile(filepath) {
+    return _openFile(filepath)
+        .then(() => {
+          console.log('openFile has been called');
+        })
+        .catch(convertError);
   },
 
   readFile(filepath, encoding) {

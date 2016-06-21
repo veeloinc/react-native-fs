@@ -156,6 +156,12 @@ RCT_EXPORT_METHOD(readFile:(NSString *)filepath
   callback(@[[NSNull null], base64Content]);
 }
 
+RCT_EXPORT_METHOD(openFile:(NSString *)filepath
+                  callback:(RCTResponseSenderBlock)callback)
+{
+  callback(@[[NSNull null], NSNull null]);
+}
+
 RCT_EXPORT_METHOD(moveFile:(NSString *)filepath
                   destPath:(NSString *)destPath
                   callback:(RCTResponseSenderBlock)callback)

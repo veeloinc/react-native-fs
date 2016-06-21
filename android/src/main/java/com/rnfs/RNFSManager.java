@@ -8,9 +8,12 @@ import java.util.ArrayList;
 import android.os.Environment;
 import android.os.AsyncTask;
 import android.util.Base64;
+import android.net.Uri;
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.util.SparseArray;
+import android.webkit.MimeTypeMap;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -98,6 +101,22 @@ public class RNFSManager extends ReactContextBaseJavaModule {
       String base64Content = Base64.encodeToString(buffer, Base64.NO_WRAP);
 
       callback.invoke(null, base64Content);
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      callback.invoke(makeErrorPayload(ex));
+    }
+  }
+
+  @ReactMethod
+  public void openFile(String filepath, Callback callback) {
+    try {
+      File file = new File(filepath);
+      MimeTypeMap myMime = MimeTypeMap.getSingleton();
+      Intent newIntent = new Intent(Intent.ACTION_VIEW);
+      String mimeType = myMime.getMimeTypeFromExtension(fileExt(file).substring(1));
+      newIntent.setDataAndType(Uri.fromFile(file), mimeType);
+      newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      context.startActivity(newIntent);
     } catch (Exception ex) {
       ex.printStackTrace();
       callback.invoke(makeErrorPayload(ex));
