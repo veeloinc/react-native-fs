@@ -129,13 +129,13 @@ public class RNFSManager extends ReactContextBaseJavaModule {
   @ReactMethod
   public void openFile(String filepath, Callback callback) {
     try {
+      Activity currentActivity = getCurrentActivity();
       File file = new File(filepath);
       MimeTypeMap myMime = MimeTypeMap.getSingleton();
       Intent newIntent = new Intent(Intent.ACTION_VIEW);
       String mimeType = myMime.getMimeTypeFromExtension(fileExt(filepath).substring(1));
       newIntent.setDataAndType(Uri.fromFile(file), mimeType);
       newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-      Activity currentActivity = this.getCurrentActivity();
       if (currentActivity != null) {
         currentActivity.startActivity(newIntent);
       } else {
