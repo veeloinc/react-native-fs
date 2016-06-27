@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
 
+import android.app.Activity;
 import android.os.Environment;
 import android.os.AsyncTask;
 import android.util.Base64;
@@ -107,16 +108,39 @@ public class RNFSManager extends ReactContextBaseJavaModule {
     }
   }
 
+  protected String fileExt(String url) {
+      if (url.indexOf("?") > -1) {
+          url = url.substring(0, url.indexOf("?"));
+      }
+      if (url.lastIndexOf(".") == -1) {
+          return null;
+      } else {
+          String ext = url.substring(url.lastIndexOf(".") + 1);
+          if (ext.indexOf("%") > -1) {
+              ext = ext.substring(0, ext.indexOf("%"));
+          }
+          if (ext.indexOf("/") > -1) {
+              ext = ext.substring(0, ext.indexOf("/"));
+          }
+          return ext.toLowerCase();
+      }
+  }
+
   @ReactMethod
   public void openFile(String filepath, Callback callback) {
     try {
       File file = new File(filepath);
       MimeTypeMap myMime = MimeTypeMap.getSingleton();
       Intent newIntent = new Intent(Intent.ACTION_VIEW);
-      String mimeType = myMime.getMimeTypeFromExtension(fileExt(file).substring(1));
+      String mimeType = myMime.getMimeTypeFromExtension(fileExt(filepath).substring(1));
       newIntent.setDataAndType(Uri.fromFile(file), mimeType);
       newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-      context.startActivity(newIntent);
+      Activity currentActivity = this.getCurrentActivity();
+      if (currentActivity != null) {
+        currentActivity.startActivity(newIntent);
+      } else {
+        this.getReactApplicationContext().startActivity(newIntent);
+      }
     } catch (Exception ex) {
       ex.printStackTrace();
       callback.invoke(makeErrorPayload(ex));
