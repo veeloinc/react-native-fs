@@ -27,6 +27,7 @@ android {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
