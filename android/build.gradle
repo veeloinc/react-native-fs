@@ -28,11 +28,6 @@ android {
 repositories {
     mavenCentral()
     mavenLocal()
-    jcenter()
-    maven {
-        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-        url "/Users/martin/src/veelo-native/node_modules/react-native/android"
-    }
 }
 
 dependencies {
