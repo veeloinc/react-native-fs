@@ -122,7 +122,9 @@ public class RNFSManager extends ReactContextBaseJavaModule {
       MimeTypeMap myMime = MimeTypeMap.getSingleton();
       Intent newIntent = new Intent(Intent.ACTION_CHOOSER);
       String mimeType = myMime.getMimeTypeFromExtension(fileExt(filepath).substring(1));
-      newIntent.setDataAndType(Uri.fromFile(file), mimeType);
+      System.out.println("look! mimetype!");
+      System.out.println(mimeType);
+      newIntent.setDataAndType(Uri.fromFile(file), "audio/mpeg");
       newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
       if (currentActivity != null) {
         currentActivity.startActivity(newIntent);
