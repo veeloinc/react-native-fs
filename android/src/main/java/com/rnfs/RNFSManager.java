@@ -36,6 +36,7 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.modules.core.RCTNativeAppEventEmitter;
 
+
 public class RNFSManager extends ReactContextBaseJavaModule {
 
   private static final String NSDocumentDirectoryPath = "NSDocumentDirectoryPath";
@@ -281,8 +282,7 @@ public class RNFSManager extends ReactContextBaseJavaModule {
       };
 
       Downloader downloader = new Downloader();
-
-      downloader.execute(params);
+      new Thread(new DoDownload(downloader, params)).start();
 
       this.downloaders.put(jobId, downloader);
     } catch (Exception ex) {
