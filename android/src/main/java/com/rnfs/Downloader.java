@@ -15,6 +15,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.os.AsyncTask;
 
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
+
 public class Downloader extends AsyncTask<DownloadParams, int[], DownloadResult> {
   private DownloadParams mParam;
   private AtomicBoolean mAbort = new AtomicBoolean(false);
@@ -39,15 +41,44 @@ public class Downloader extends AsyncTask<DownloadParams, int[], DownloadResult>
   private void download(DownloadParams param, DownloadResult res) throws IOException {
     InputStream input = null;
     OutputStream output = null;
+    HttpURLConnection connection = null;
 
     try {
-      HttpURLConnection connection = (HttpURLConnection)param.src.openConnection();
+      connection = (HttpURLConnection)param.src.openConnection();
+
+      ReadableMapKeySetIterator iterator = param.headers.keySetIterator();
+
+      while (iterator.hasNextKey()) {
+        String key = iterator.nextKey();
+        String value = param.headers.getString(key);
+        connection.setRequestProperty(key, value);
+      }
 
       connection.setConnectTimeout(5000);
       connection.connect();
 
       int statusCode = connection.getResponseCode();
       int lengthOfFile = connection.getContentLength();
+
+      boolean isRedirect = (
+        statusCode != HttpURLConnection.HTTP_OK &&
+        (
+          statusCode == HttpURLConnection.HTTP_MOVED_PERM ||
+          statusCode == HttpURLConnection.HTTP_MOVED_TEMP
+        )
+      );
+
+      if (isRedirect) {
+        String redirectURL = connection.getHeaderField("Location");
+        connection.disconnect();
+
+        connection = (HttpURLConnection) new URL(redirectURL).openConnection();
+        connection.setConnectTimeout(5000);
+        connection.connect();
+
+        statusCode = connection.getResponseCode();
+        lengthOfFile = connection.getContentLength();
+      }
 
       Map<String, List<String>> headers = connection.getHeaderFields();
 
@@ -56,7 +87,7 @@ public class Downloader extends AsyncTask<DownloadParams, int[], DownloadResult>
       for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
         String headerKey = entry.getKey();
         String valueKey = entry.getValue().get(0);
-        
+
         if (headerKey != null && valueKey != null) {
           headersFlat.put(headerKey, valueKey);
         }
@@ -88,6 +119,7 @@ public class Downloader extends AsyncTask<DownloadParams, int[], DownloadResult>
     } finally {
       if (output != null) output.close();
       if (input != null) input.close();
+      if (connection != null) connection.disconnect();
     }
   }
 
