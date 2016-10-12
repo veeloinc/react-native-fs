@@ -228,7 +228,7 @@ public class RNFSManager extends ReactContextBaseJavaModule {
       final int jobId = options.getInt("jobId");
       ReadableMap headers = options.getMap("headers");
 
-      DownloadParams params = new DownloadParams();
+      final DownloadParams params = new DownloadParams();
 
       params.src = url;
       params.dest = file;
@@ -281,8 +281,12 @@ public class RNFSManager extends ReactContextBaseJavaModule {
         }
       };
 
-      Downloader downloader = new Downloader();
-      new Thread(new DoDownload(downloader, params)).start();
+      final Downloader downloader = new Downloader();
+      new Thread(new Runnable() {
+        public void run() {
+          downloader.execute(params);
+        }
+      }).start();
 
       this.downloaders.put(jobId, downloader);
     } catch (Exception ex) {
